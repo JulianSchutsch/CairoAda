@@ -1,0 +1,13 @@
+gdk-cairo Ada binding
+
+It is a minimalist binding that can be used to use CairoAda with GtkAda.
+It follows GtkAda conventions.
+
+License
+*******
+This binding is covered by the GNAT Modified GPL (GMGPL).
+
+This binding depends on GtkAda which is available under different licenses.
+
+
+

@@ -1,0 +1,15 @@
+Those tests are translations of tests and snipets that can be found on Cairo web site.
+
+Currently, tests are built in obj directory.
+
+cairo_test_snippets
+   This test depends on CairoAda and the RSVG binding.
+   It uses data/* files.
+   This test must be run from this directory (just over data directory).
+
+cairo_test_user_fonts
+   Ada translation of a C test.
+
+cairo_gdk
+   This test depends on CairoAda, GtkAda and the Gdk.Cairo package that is provided.
+   It can be run from anywhere.

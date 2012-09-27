@@ -1,0 +1,20 @@
+librsvg Ada binding
+
+This binding is in line with librsvg-2.26.0
+It is complete, but does not provide access to deprecated functions.
+
+History
+*******
+
+2009.07.04
+- Changed SRVG occurrences into RSVG
+- Changed order of Error and Success parameters in Close (more compliant with other cases)
+- Added the missing Success parameter in: Render and Render_Sub
+- Added missing functions : RSVG_New_From_Data and Write 
+- Added new functions: Get_Dimensions_Sub, Get_Position_Sub and Has_Sub
+
+License
+*******
+This binding is covered by the GNAT Modified GPL (GMGPL).
+
+This binding depends on GtkAda which is available under different licenses.

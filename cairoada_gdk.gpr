@@ -1,0 +1,19 @@
+with "common.gpr";
+with "cairoada.gpr";
+with "gtkada.gpr";
+
+project CairoAda_Gdk is
+
+   for Source_Dirs use ("src/gdk");
+   for Object_Dir use "obj/" & Common.Obj_Id & "/gdk";
+   for Library_Kind use Common.Library_Kind;
+   for library_Dir use "lib/" & Common.Lib_Id;
+   for Library_Name use "cairoadagdk";
+
+   package Compiler is
+      for Default_Switches ("ada") use
+         Common.Compiler'Default_Switches ("ada") & "-gnat95";
+      --for Default_Switches ("ada") use ("-O2", "-gnatf", "-gnatp", "-gnatwcfijklmoprvz", "-gnatybfh", "-gnat95");
+   end Compiler;
+
+end CairoAda_Gdk;

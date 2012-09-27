@@ -1,0 +1,5 @@
+At the momemnt there is no way to configure & install this automatically.
+One should only need to change gpr files (at least on Linux or Unix boxes).
+The only Ada external dependency is on GtkAda.
+One needs to change the corresponding "with ..." in gpr files that need it.
+One also need to change the link options appropriately (cairo, gtk+, ...)

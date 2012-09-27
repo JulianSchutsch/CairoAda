@@ -1,0 +1,44 @@
+with "common.gpr";
+with "cairoada_rsvg.gpr";
+with "cairoada_gdk.gpr";
+
+project Cairoada_Tests is
+
+   for Source_Dirs use ("tests//**");
+   for Object_Dir use "obj/" & Common.Obj_Id;
+   for Exec_Dir use "bin";
+
+   package Builder is
+      for Default_Switches ("ada") use ("-k");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use
+         Common.Compiler'Default_Switches ("ada") &  ("-gnat05", "-gnaty-s");
+      --for Default_Switches ("ada") use ("-gnatf", "-gnatwcfijklmoprvz", "-gnatybfh", "-g", "-gnata", "-gnat05");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use
+         Common.Binder'Default_Switches ("ada");
+   end Binder;
+
+   package Linker is
+      case Common.OS is
+         when "Linux" =>
+            for Default_Switches ("ada") use
+               ("-g", "-L/tools/soft/cairo/lib", "-lcairo", "-lrsvg-2");
+         when "Windows_NT" =>
+            for Default_Switches ("ada") use
+              ("-g", "-Lc:/GNAT/2009/lib/import");
+      end case;
+   end Linker;
+
+   for Main use
+      ("cairo_gdk_main.adb",
+       "cairo_test_impl.adb",
+       "cairo_test_snippets.adb",
+       "cairo_test_user_fonts.adb");
+
+end Cairoada_Tests;
+

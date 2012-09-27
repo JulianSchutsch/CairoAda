@@ -1,0 +1,203 @@
+abstract project Common is
+
+   type OS_Type is ("Linux", "Windows_NT");
+   OS : OS_Type := External ("OS", "Linux");
+
+   OS_Name := "";
+   case OS is
+      when "Linux" =>       OS_Name := "linux";
+      when "Windows_NT" =>  OS_Name := "win";
+   end case;
+
+
+   type Library_Kind_Type is ("static", "relocatable");
+   Library_Kind : Library_Kind_Type := External ("LIBRARY_KIND", "static");
+
+   type Build_Type is ("debug", "release");
+   Build : Build_Type := External ("BUILD", "debug");
+
+   Build_Id := OS_Name & "-" & Build;
+   Lib_Id := Build_Id & "-" & Library_Kind;
+   Obj_Id := Build_Id & "-" & Library_Kind;
+   Exe_Id := Build_Id & "-" & Library_Kind;
+
+   CFLAGS :=
+     ("-ansi",
+      "-pendantic",
+      "-Wall",
+      "-Wextra");
+
+   GNATFLAGS :=
+     (--"-gnat05", --  Allow Ada 2005 extensions
+      "-gnata",  --  Assertions enabled. Pragma Assert/Debug to be activated
+      "-gnatef", --  Full source path in brief error messages
+      "-gnatf",  --  Full errors. Verbose details, all undefined references
+      "-gnatn",  --  Inlining of subprograms (apply pragma Inline across units)
+      "-gnatU",  --  Enable unique tag for error messages
+      "-gnatwa", --  turn on all optional warnings (except d,h,l,t)
+      "-gnatwl", --  turn on warnings for missing elaboration pragma
+      "-gnaty3aAbdefhiklnprSstx"); --  Style checks
+     --  3 Indentation level
+     --  a Check attribute casing
+     --  A Use of array index numbers in array attributes
+     --  b Blanks not allowed at statement end
+     --  d Check no DOS line terminators present
+     --  e Check end/exit labels
+     --  f No form feeds or vertical tabs
+     --  h No horizontal tabs
+     --  i Check if-then layout
+     --  k Check keyword casing
+     --  l Check layout
+     --  m Check maximum line length
+     --  n Check casing of entities in Standard
+     --  p Check pragma casing
+     --  r Check references
+     --  S Check no statements after THEN/ELSE
+     --  s Check separate specs
+     --  t Check token spacing
+     --  u Check unnecessary blank lines
+     --  x Check extra parentheses
+
+   for Source_Files use (); -- No source files
+
+   package Compiler is
+      case Build is
+         when "release" =>
+            for Default_Switches ("ada") use
+              ("-O2",     --  Extensive optimization
+               "-funroll-loops",
+               "-gnatn",  --  Activate inlining for subprograms for which pragma inline is specified
+               "-g")      --  Generate debugging information
+               & GNATFLAGS;
+            for Default_Switches ("c") use
+              ("-O2",     --  Extensive optimization
+               "-funroll-loops",
+               "-g")       --  Generate debugging information
+               & CFLAGS;
+         when "debug" =>
+            for Default_Switches ("ada") use
+              ("-O0",    --  No optimization
+               "-g",     --  Generate debugging information
+               "-gnato") --  Enable numeric overflow checking
+               & GNATFLAGS;
+            for Default_Switches ("c") use
+              ("-O0",     --  Extensive optimization
+               "-g")       --  Generate debugging information
+               & CFLAGS;
+      end case;
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use
+         ("-E",       -- Store tracebacks in exceptions
+          "-shared"); -- Link against a shared GNAT run time when available
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g");
+   end Linker;
+
+end Common;
+
+
+--project Common is
+--
+--   type Bool_Type is ("Yes", "No");
+--   Have_ASIS : Bool_Type := External ("HAVE_ASIS", "No");
+--   Have_EDG  : Bool_Type := External ("HAVE_EDG",  "No");
+--   Have_Java : Bool_Type := External ("HAVE_JAVA", "No");
+--
+--   type OS_Type is ("UNIX", "Windows_NT");
+--   OS : OS_Type := External ("OS", "UNIX");
+--
+--   type Target_OS_Type is
+--     ("linux-gnu",
+--      "mingw32", "cygwin",
+--      "solaris2.8", "solaris2.9", "solaris2.10");
+--   Target_OS : Target_OS_Type := External ("TARGETOS");
+--
+--   type Debug_Type is ("Yes", "No");
+--   Debug_Build : Debug_Type := External ("BAUHAUS_DEBUG", "No");
+--
+--   Parallel_Processes := External ("PARALLEL_PROCESSES", "-j4");
+--
+--   Global_Obj      := External ("GLOBAL_OBJ");
+--   Global_Lib      := External ("GLOBAL_LIB");
+--   Distrib_Exe     := External ("DISTRIB_EXE");
+--   Distrib_Lib     := External ("DISTRIB_LIB");
+--   Distrib_Plugins := External ("DISTRIB_PLUGINS");
+--   Gnatmake_Path   := External ("GNATMAKE");
+--   CC_Path         := External ("CC");
+--   CXX_Path        := External ("CXX");
+--   Java_Home       := External ("JAVA_HOME", "");
+--
+--   CXX_M64         := External ("CXX_M64", "");
+--   --  Set this to "-m64" in order to let g++ produce 64-bit code.
+--
+--   for Source_Files use ();
+--
+--   for Library_Kind use "dynamic";
+--
+--   package Linker is
+--      ORIGIN := "-Wl,-z,origin,-R,$ORIGIN/../lib";
+--      case OS is
+--         when "UNIX" =>
+--            for Linker_Options use (CXX_M64);
+--            for Default_Switches ("ada") use ("-g", ORIGIN);
+--            for Default_Switches ("c")   use ("-g", ORIGIN);
+--            for Default_Switches ("c++") use ("-g", ORIGIN);
+--         when "Windows_NT" =>
+--            for Linker_Options use
+--              ("-Wl,--large-address-aware", Global_Obj & "bauhaus-rc-icon.o");
+--            for Default_Switches ("ada") use ("-g");
+--            for Default_Switches ("c")   use ("-g");
+--            for Default_Switches ("c++") use ("-g");
+--      end case;
+--   end Linker;
+--
+--   package Binder is
+--      for Default_Switches ("ada") use ("-E");
+--   end Binder;
+--
+--   GNATFLAGS :=
+--     ("-gnat05", --  Allow Ada 2005 extensions
+--      "-gnata",  --  Assertions enabled. Pragma Assert/Debug to be activated
+--      "-gnatef", --  Full source path in brief error messages
+--      "-gnatf",  --  Full errors. Verbose details, all undefined references
+--      "-gnatn",  --  Inlining of subprograms (apply pragma Inline across units)
+--      "-gnatU",  --  Enable unique tag for error messages
+--      "-gnatwa", --  turn on all optional warnings (except d,h,l,t)
+--      "-gnatwl", --  turn on warnings for missing elaboration pragma
+--      "-gnatyaAbdefhiklmnprtx");
+--
+--   package Compiler is
+--      case Debug_Build is
+--         when "No" =>
+--            for Default_Switches ("ada") use ("-O2", "-funroll-loops", "-g") &
+--              GNATFLAGS;
+--            for Default_Switches ("c")   use ("-O2", "-funroll-loops", "-g");
+--            for Default_Switches ("c++") use ("-O2", "-funroll-loops", "-g") &
+--              CXX_M64;
+--         when "Yes" =>
+--            --  "-fstack-check" still produces invalid code (GNAT Pro 6.0.1)
+--            for Default_Switches ("ada") use ("-O0", "-g", "-gnato") &
+--              GNATFLAGS;
+--            for Default_Switches ("c")   use ("-O0", "-g");
+--            for Default_Switches ("c++") use ("-O0", "-g") & CXX_M64;
+--      end case;
+--   end Compiler;
+--
+--   package Builder is
+--      for Default_Switches ("ada") use (Parallel_Processes, "-g");
+--      for Default_Switches ("c")   use (Parallel_Processes, "-g");
+--      for Default_Switches ("c++") use (Parallel_Processes, "-g");
+--   end Builder;
+--
+--   package Ide is
+--      for Vcs_Kind use "Subversion";
+--      for Compiler_Command ("ada") use Gnatmake_Path;
+--      for Compiler_Command ("c")   use CC_Path;
+--      for Compiler_Command ("c++") use CXX_Path;
+--   end Ide;
+--
+--end Common;
